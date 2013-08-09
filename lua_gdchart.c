@@ -21,8 +21,25 @@
 #include <lua.h>
 #include <lauxlib.h> 
 
+#include "array_alloc.h"
 #include "gdc.h"
 #include "gdchart.h"
+#include "gdcpie.h"
+
+char *GDC_annotation_font = NULL;
+char *GDCPIE_title_font = NULL;
+int GDC_xaxis_ptsize = 1;
+char *GDC_ytitle_font = NULL;
+int GDC_xtitle_ptsize = 1;
+char *GDC_xtitle_font = NULL;
+int GDC_annotation_ptsize = 1;
+char *GDCPIE_label_font = NULL;
+int GDC_ytitle_ptsize = 1;
+int GDC_title_ptsize = 1;
+char *GDC_xaxis_font = NULL;
+int GDCPIE_title_ptsize = 1;
+char *GDC_title_font = NULL;
+int GDCPIE_label_ptsize = 2;
 
 static int lua_gdgraph_draw(lua_State *L)
 {
@@ -56,6 +73,8 @@ static int lua_gdgraph_draw(lua_State *L)
   FILE *fp = fopen(lua_tostring(L, -1), "w+");
   lua_pop(L, 1);
 
+  printf("OK\n");
+
   lua_pushstring(L, "width");
   lua_gettable(L, -2);
   if (lua_isnumber(L, -1))
@@ -67,16 +86,10 @@ static int lua_gdgraph_draw(lua_State *L)
   if (lua_isnumber(L, -1))
 	h = lua_tonumber(L, -1);
   lua_pop(L, 1);
-
-  unsigned long sc[1]    = { 0xFF8080 };
  
-  GDC_BGColor   = 0xFFFFFFL;
-  GDC_LineColor = 0x000000L;
-  GDC_SetColor  = &(sc[0]);
-  GDC_stack_type = GDC_STACK_BESIDE;
-	
   GDC_out_graph(w, h, fp, GDC_BAR, i, (char **)x, 1, y, NULL);
 
+  fclose(fp);
   lua_pushboolean(L, 1);
   return 1;
  check_args:
@@ -88,7 +101,7 @@ static luaL_Reg funcs[] = {
   {NULL, NULL}
 };
 
-int luaopen_gdgrapd(lua_State *L)
+int luaopen_lua_gdchart(lua_State *L)
 {
   lua_newtable(L);
   luaL_setfuncs(L, funcs, 0);

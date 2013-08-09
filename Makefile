@@ -1,5 +1,5 @@
 all:
-	gcc -std=gnu99 -Wall -Werror -fPIC --shared -o lua_gdchart.so lua_gdchart.c `pkg-config --libs --cflags lua5.2` -lgdc
+	gcc -std=gnu99 -Wall -Werror -fPIC --shared -o lua_gdchart.so lua_gdchart.c `pkg-config --libs --cflags lua5.2` -lgdc -lfreetype
 	strip --strip-debug --strip-all lua_gdchart.so
 	chmod 755 test.lua
 
