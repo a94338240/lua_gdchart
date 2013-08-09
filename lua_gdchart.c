@@ -56,13 +56,20 @@ static int lua_gdgraph_draw(lua_State *L)
 	fprintf(stderr, "dataset is not a table, it's %s\n", lua_typename(L, -1));
 	goto check_args;
   }
+
   lua_pushnil(L);
   int i = 0;
   while (lua_next(L, -2)) {
-	const char *key = lua_tostring(L, -2);
-	float value = lua_tonumber(L, -1);
-	x[i] = key;
-	y[i] = value;
+	lua_pushstring(L, "x");
+	lua_gettable(L, -2);
+	x[i] = lua_tostring(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "y");
+	lua_gettable(L, -2);
+	y[i] = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
 	lua_pop(L, 1);
 	i++;
   }
@@ -71,7 +78,7 @@ static int lua_gdgraph_draw(lua_State *L)
   lua_pushstring(L, "file");
   lua_gettable(L, -2);
   if (!lua_isstring(L, -1)) {
-	fprintf(stderr, "file is not a string\n");
+	fprintf(stderr, "file is not a string, it's %s\n", lua_typename(L, -1));
 	goto check_args;
   }
   FILE *fp = fopen(lua_tostring(L, -1), "w+");
