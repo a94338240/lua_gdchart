@@ -40,7 +40,7 @@ char *GDC_xaxis_font = NULL;
 int GDCPIE_title_ptsize = 1;
 char *GDC_title_font = NULL;
 int GDCPIE_label_ptsize = 2;
-
+  
 static int lua_gdgraph_draw(lua_State *L)
 {
   const char *x[1024] = {0};
@@ -94,6 +94,24 @@ static int lua_gdgraph_draw(lua_State *L)
   lua_gettable(L, -2);
   if (lua_isnumber(L, -1))
 	h = lua_tonumber(L, -1);
+  lua_pop(L, 1);
+
+  lua_pushstring(L, "ylabel_fmt");
+  lua_gettable(L, -2);
+  if (lua_isstring(L, -1))
+	GDC_ylabel_fmt = (char *)lua_tostring(L, -1);
+  lua_pop(L, 1);
+
+  lua_pushstring(L, "xtitle");
+  lua_gettable(L, -2);
+  if (lua_isstring(L, -1))
+	GDC_xtitle = (char *)lua_tostring(L, -1);
+  lua_pop(L, 1);
+
+  lua_pushstring(L, "ytitle");
+  lua_gettable(L, -2);
+  if (lua_isstring(L, -1))
+	GDC_ytitle = (char *)lua_tostring(L, -1);
   lua_pop(L, 1);
  
   GDC_out_graph(w, h, fp, GDC_BAR, i, (char **)x, 1, y, NULL);
