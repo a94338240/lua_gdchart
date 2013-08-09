@@ -84,8 +84,6 @@ static int lua_gdgraph_draw(lua_State *L)
   FILE *fp = fopen(lua_tostring(L, -1), "w+");
   lua_pop(L, 1);
 
-  printf("OK\n");
-
   lua_pushstring(L, "width");
   lua_gettable(L, -2);
   if (lua_isnumber(L, -1))
