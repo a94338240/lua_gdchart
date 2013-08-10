@@ -52,106 +52,100 @@ static int chart_type = GDC_BAR;
 static int width = 400;
 static int height = 350;
 
+static int lua_table_check(lua_State *L, const char *key)
+{
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  int check = lua_isnil(L, -1);
+  lua_pop(L, 1);
+  return !check;
+}
+
+static char *lua_table_get_string(lua_State *L, const char *key)
+{
+  char *val = NULL;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_isstring(L, -1))
+	val = (char *)lua_tostring(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
+
+static double lua_table_get_number(lua_State *L, const char *key)
+{
+  double val = 0;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_isnumber(L, -1))
+	val = lua_tonumber(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
+ 
+static int lua_table_get_boolean(lua_State *L, const char *key)
+{
+  int val = 0;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_isboolean(L, -1))
+	val = lua_toboolean(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
+
+static void *lua_table_get_userdata(lua_State *L, const char *key)
+{
+  void *val = 0;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_islightuserdata(L, -1))
+	val = lua_touserdata(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
+
 static int lua_gdchart_style(lua_State *L)
 {
   if (!lua_istable(L, -1))
 	goto check_args;
 
-  lua_pushstring(L, "width");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	width = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "height");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	height = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "title");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_title = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "xtitle");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_xtitle = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ytitle");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_ytitle = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ytitle2");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_ytitle2 = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "title_size");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_title_size = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "xtitle_size");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_xtitle_size = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ytitle_size");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_ytitle_size = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "xaxis_font_size");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_ytitle_size = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "yaxis_font_size");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_ytitle_size = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ylabel_fmt");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_ylabel_fmt = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ylabel2_fmt");
-  lua_gettable(L, -2);
-  if (lua_isstring(L, -1))
-	GDC_ylabel2_fmt = (char *)lua_tostring(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "xlabel_spacing");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_xlabel_spacing = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "ylabel_density");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_ylabel_density = lua_tonumber(L, -1);
-  lua_pop(L, 1);
-
-  lua_pushstring(L, "requested_ymin");
-  lua_gettable(L, -2);
-  if (lua_isnumber(L, -1))
-	GDC_requested_ymin = lua_tonumber(L, -1);
-  lua_pop(L, 1);
+  if (lua_table_check(L, "width")) width = lua_table_get_number(L, "width");
+  if (lua_table_check(L, "height")) height = lua_table_get_number(L, "height");
+  if (lua_table_check(L, "title")) GDC_title = lua_table_get_string(L, "title");
+  if (lua_table_check(L, "xtitle")) GDC_xtitle = lua_table_get_string(L, "xtitle");
+  if (lua_table_check(L, "ytitle")) GDC_ytitle = lua_table_get_string(L, "ytitle");
+  if (lua_table_check(L, "ytitle2")) GDC_ytitle2 = lua_table_get_string(L, "ytitle2");
+  if (lua_table_check(L, "title_size")) GDC_title_size = lua_table_get_number(L, "title_size");
+  if (lua_table_check(L, "xtitle_size")) GDC_xtitle_size = lua_table_get_number(L, "xtitle_size");
+  if (lua_table_check(L, "ytitle_size")) GDC_ytitle_size = lua_table_get_number(L, "ytitle_size");
+  if (lua_table_check(L, "xaxisfont_size")) GDC_xaxisfont_size = lua_table_get_number(L, "xaxisfont_size");
+  if (lua_table_check(L, "yaxisfont_size")) GDC_yaxisfont_size = lua_table_get_number(L, "yaxisfont_size");
+  if (lua_table_check(L, "ylabel_fmt")) GDC_ylabel_fmt = lua_table_get_string(L, "ylabel_fmt");
+  if (lua_table_check(L, "ylabel2_fmt")) GDC_ylabel2_fmt = lua_table_get_string(L, "ylabel2_fmt");
+  if (lua_table_check(L, "xlabel_spacing")) GDC_xlabel_spacing = lua_table_get_number(L, "xlabel_spacing");
+  if (lua_table_check(L, "ylabel_density")) GDC_ylabel_density = lua_table_get_number(L, "ylabel_density");
+  if (lua_table_check(L, "requested_ymin")) GDC_requested_ymin = lua_table_get_number(L, "requested_ymin");
+  if (lua_table_check(L, "requested_ymax")) GDC_requested_ymax = lua_table_get_number(L, "requested_ymax");
+  if (lua_table_check(L, "requested_yinterval")) GDC_requested_yinterval = lua_table_get_number(L, "requested_yinterval");
+  if (lua_table_check(L, "zshelf")) GDC_0Shelf = lua_table_get_boolean(L, "zshelf");
+  if (lua_table_check(L, "grid")) GDC_grid = lua_table_get_boolean(L, "grid");
+  if (lua_table_check(L, "xaxis")) GDC_xaxis = lua_table_get_boolean(L, "xaxis");
+  if (lua_table_check(L, "yaxis")) GDC_yaxis = lua_table_get_boolean(L, "yaxis");
+  if (lua_table_check(L, "yaxis2")) GDC_yaxis2 = lua_table_get_boolean(L, "yaxis2");
+  if (lua_table_check(L, "yval_style")) GDC_yval_style = lua_table_get_boolean(L, "yval_style");
+  if (lua_table_check(L, "stack_type")) GDC_yval_style = lua_table_get_boolean(L, "stack_type");
+  if (lua_table_check(L, "_3d_depth")) GDC_3d_depth = lua_table_get_number(L, "_3d_depth");
+  if (lua_table_check(L, "_3d_angle")) GDC_3d_angle = lua_table_get_number(L, "_3d_angle");
+  if (lua_table_check(L, "bar_width")) GDC_bar_width = lua_table_get_number(L, "bar_width");
+  if (lua_table_check(L, "HLC_style")) GDC_HLC_style = lua_table_get_number(L, "hlc_style");
+  if (lua_table_check(L, "HLC_cap_width")) GDC_HLC_cap_width = lua_table_get_number(L, "hlc_cap_width");
+  if (lua_table_check(L, "annotation")) GDC_annotation = lua_table_get_userdata(L, "annotation");
+  if (lua_table_check(L, "annotation_font_size")) GDC_annotation_font_size = lua_table_get_number(L, "annotation_font_size");
 
   lua_pushboolean(L, 1);
   return 1;
