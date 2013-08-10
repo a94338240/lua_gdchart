@@ -160,7 +160,7 @@ static int lua_gdchart_style(lua_State *L)
   return 0;
 }
   
-static int lua_gdgraph_draw(lua_State *L)
+static int lua_gdchart_draw(lua_State *L)
 {
   const char *x[1024] = {0};
   float y[1024] = {0.0};
@@ -212,7 +212,7 @@ static int lua_gdgraph_draw(lua_State *L)
 }
 
 static luaL_Reg funcs[] = {
-  {"draw", lua_gdgraph_draw},
+  {"draw", lua_gdchart_draw},
   {"style", lua_gdchart_style},
   {NULL, NULL}
 };
