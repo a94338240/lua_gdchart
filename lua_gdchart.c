@@ -51,6 +51,7 @@ double GDCPIE_label_ptsize = 2;
 static int chart_type = GDC_BAR;
 static int width = 400;
 static int height = 350;
+static unsigned long set_colors[1024] = {0};
 
 static int lua_table_check(lua_State *L, const char *key)
 {
@@ -146,6 +147,32 @@ static int lua_gdchart_style(lua_State *L)
   if (lua_table_check(L, "HLC_cap_width")) GDC_HLC_cap_width = lua_table_get_number(L, "hlc_cap_width");
   if (lua_table_check(L, "annotation")) GDC_annotation = lua_table_get_userdata(L, "annotation");
   if (lua_table_check(L, "annotation_font_size")) GDC_annotation_font_size = lua_table_get_number(L, "annotation_font_size");
+
+  if (lua_table_check(L, "bg_color")) GDC_BGColor = lua_table_get_number(L, "bg_color");
+  if (lua_table_check(L, "grid_color")) GDC_GridColor = lua_table_get_number(L, "grid_color"); 
+  if (lua_table_check(L, "line_color")) GDC_LineColor = lua_table_get_number(L, "line_color"); 
+  if (lua_table_check(L, "plot_color")) GDC_PlotColor = lua_table_get_number(L, "plot_color"); 
+  if (lua_table_check(L, "vol_color")) GDC_VolColor = lua_table_get_number(L, "vol_color"); 
+  if (lua_table_check(L, "title_color")) GDC_TitleColor = lua_table_get_number(L, "title_color"); 
+  if (lua_table_check(L, "xtitle_color")) GDC_XTitleColor = lua_table_get_number(L, "xtitle_color"); 
+  if (lua_table_check(L, "ytitle_color")) GDC_YTitleColor = lua_table_get_number(L, "ytitle_color"); 
+  if (lua_table_check(L, "ytitle2_color")) GDC_YTitle2Color = lua_table_get_number(L, "ytitle2_color"); 
+  if (lua_table_check(L, "xlabel_color")) GDC_XLabelColor = lua_table_get_number(L, "xlabel_color"); 
+  if (lua_table_check(L, "ylabel_color")) GDC_YLabelColor = lua_table_get_number(L, "ylabel_color"); 
+  if (lua_table_check(L, "ylabel2_color")) GDC_YLabel2Color = lua_table_get_number(L, "ylabel2_color"); 
+  if (lua_table_check(L, "set_color")) { 
+	if (!lua_istable(L, -1))
+	  goto out;
+	lua_pushnil(L);
+	int i = 0;
+	while (lua_next(L, -2)) {
+	  set_colors[i++] = lua_tonumber(L, -1);
+	  lua_pop(L, 1);
+	}
+	GDC_SetColor = set_colors;
+  out:
+	lua_pop(L, 1);
+  }
 
   lua_pushboolean(L, 1);
   return 1;
