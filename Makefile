@@ -9,4 +9,4 @@ install: lua_gdchart.so
 	install -m 0664 -o root -s lua_gdchart.so /usr/local/lib/lua/5.2
 
 clean:
-	rm -f *~ lua_gdchart.so
+	rm -f *~ lua_gdchart.so *.o *.png
