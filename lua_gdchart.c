@@ -27,10 +27,10 @@
 #include "gdcpie.h"
 
 char *GDC_annotation_font = NULL;
-double GDC_annotation_ptsize = 2;
+int GDC_annotation_ptsize = 2;
 
 char *GDC_title_font = NULL;
-double GDC_title_ptsize = 2;
+int GDC_title_ptsize = 2;
 
 
 char *GDC_ytitle_font = NULL;
@@ -85,6 +85,30 @@ static double lua_table_get_number(lua_State *L, const char *key)
   lua_pop(L, 1);
   return val;
 }
+
+static int lua_table_get_integer(lua_State *L, const char *key)
+{
+  int val = 0;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_isnumber(L, -1))
+	val = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
+
+static int lua_table_get_unsigned(lua_State *L, const char *key)
+{
+  int val = 0;
+
+  lua_pushstring(L, key);
+  lua_gettable(L, -2);
+  if (lua_isnumber(L, -1))
+	val = lua_tounsigned(L, -1);
+  lua_pop(L, 1);
+  return val;
+}
  
 static int lua_table_get_boolean(lua_State *L, const char *key)
 {
@@ -128,7 +152,7 @@ static int lua_gdchart_style(lua_State *L)
   if (lua_table_check(L, "yaxisfont_size")) GDC_yaxisfont_size = lua_table_get_number(L, "yaxisfont_size");
   if (lua_table_check(L, "ylabel_fmt")) GDC_ylabel_fmt = lua_table_get_string(L, "ylabel_fmt");
   if (lua_table_check(L, "ylabel2_fmt")) GDC_ylabel2_fmt = lua_table_get_string(L, "ylabel2_fmt");
-  if (lua_table_check(L, "xlabel_spacing")) GDC_xlabel_spacing = lua_table_get_number(L, "xlabel_spacing");
+  if (lua_table_check(L, "xlabel_spacing")) GDC_xlabel_spacing = lua_table_get_integer(L, "xlabel_spacing");
   if (lua_table_check(L, "ylabel_density")) GDC_ylabel_density = lua_table_get_number(L, "ylabel_density");
   if (lua_table_check(L, "requested_ymin")) GDC_requested_ymin = lua_table_get_number(L, "requested_ymin");
   if (lua_table_check(L, "requested_ymax")) GDC_requested_ymax = lua_table_get_number(L, "requested_ymax");
@@ -148,25 +172,25 @@ static int lua_gdchart_style(lua_State *L)
   if (lua_table_check(L, "annotation")) GDC_annotation = lua_table_get_userdata(L, "annotation");
   if (lua_table_check(L, "annotation_font_size")) GDC_annotation_font_size = lua_table_get_number(L, "annotation_font_size");
 
-  if (lua_table_check(L, "bg_color")) GDC_BGColor = lua_table_get_number(L, "bg_color");
-  if (lua_table_check(L, "grid_color")) GDC_GridColor = lua_table_get_number(L, "grid_color"); 
-  if (lua_table_check(L, "line_color")) GDC_LineColor = lua_table_get_number(L, "line_color"); 
-  if (lua_table_check(L, "plot_color")) GDC_PlotColor = lua_table_get_number(L, "plot_color"); 
-  if (lua_table_check(L, "vol_color")) GDC_VolColor = lua_table_get_number(L, "vol_color"); 
-  if (lua_table_check(L, "title_color")) GDC_TitleColor = lua_table_get_number(L, "title_color"); 
-  if (lua_table_check(L, "xtitle_color")) GDC_XTitleColor = lua_table_get_number(L, "xtitle_color"); 
-  if (lua_table_check(L, "ytitle_color")) GDC_YTitleColor = lua_table_get_number(L, "ytitle_color"); 
-  if (lua_table_check(L, "ytitle2_color")) GDC_YTitle2Color = lua_table_get_number(L, "ytitle2_color"); 
-  if (lua_table_check(L, "xlabel_color")) GDC_XLabelColor = lua_table_get_number(L, "xlabel_color"); 
-  if (lua_table_check(L, "ylabel_color")) GDC_YLabelColor = lua_table_get_number(L, "ylabel_color"); 
-  if (lua_table_check(L, "ylabel2_color")) GDC_YLabel2Color = lua_table_get_number(L, "ylabel2_color"); 
+  if (lua_table_check(L, "bg_color")) GDC_BGColor = lua_table_get_unsigned(L, "bg_color");
+  if (lua_table_check(L, "grid_color")) GDC_GridColor = lua_table_get_unsigned(L, "grid_color"); 
+  if (lua_table_check(L, "line_color")) GDC_LineColor = lua_table_get_unsigned(L, "line_color"); 
+  if (lua_table_check(L, "plot_color")) GDC_PlotColor = lua_table_get_unsigned(L, "plot_color"); 
+  if (lua_table_check(L, "vol_color")) GDC_VolColor = lua_table_get_unsigned(L, "vol_color"); 
+  if (lua_table_check(L, "title_color")) GDC_TitleColor = lua_table_get_unsigned(L, "title_color"); 
+  if (lua_table_check(L, "xtitle_color")) GDC_XTitleColor = lua_table_get_unsigned(L, "xtitle_color"); 
+  if (lua_table_check(L, "ytitle_color")) GDC_YTitleColor = lua_table_get_unsigned(L, "ytitle_color"); 
+  if (lua_table_check(L, "ytitle2_color")) GDC_YTitle2Color = lua_table_get_unsigned(L, "ytitle2_color"); 
+  if (lua_table_check(L, "xlabel_color")) GDC_XLabelColor = lua_table_get_unsigned(L, "xlabel_color"); 
+  if (lua_table_check(L, "ylabel_color")) GDC_YLabelColor = lua_table_get_unsigned(L, "ylabel_color"); 
+  if (lua_table_check(L, "ylabel2_color")) GDC_YLabel2Color = lua_table_get_unsigned(L, "ylabel2_color"); 
   if (lua_table_check(L, "set_color")) { 
 	if (!lua_istable(L, -1))
 	  goto out;
 	lua_pushnil(L);
 	int i = 0;
 	while (lua_next(L, -2)) {
-	  set_colors[i++] = lua_tonumber(L, -1);
+	  set_colors[i++] = lua_tounsigned(L, -1);
 	  lua_pop(L, 1);
 	}
 	GDC_SetColor = set_colors;
